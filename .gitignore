@@ -1,0 +1,16 @@
+.env
+.venv/
+.venv_new/
+__pycache__/
+*.pyc
+.DS_Store
+*.egg-info/
+.pytest_cache/
+
+# Generated data (rebuild with scripts)
+data/*.db
+data/*.parquet
+data/*.csv
+
+# Keep directory
+!data/.gitkeep

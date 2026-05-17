@@ -1,43 +1,73 @@
+# Polymarket research pipeline
 
+Pull resolved markets, trade fills, USDC funding history, and build wallet/trade-level features for modeling.
 
-## Data
+## Setup
 
-Pulled from FRED (2010–present, monthly):
-- **VIX** (`VIXCLS`) — implied vol from S&P 500 options
-- **EPU** (`USEPUINDXD`) — Baker/Bloom/Davis Economic Policy Uncertainty index
-- **S&P 500** (`^GSPC` via yfinance) — daily close, resampled to month-end
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env   # add ETHERSCAN_API_KEY
+```
 
-All series aligned to month-end. Returns computed as % change. VIX and EPU
-converted to first differences (diffs) to make them stationary.
+## Pipeline (run in order)
 
-## Plots
+### 1. Market cache + keyword filter
 
-1. **Time series of monthly diffs** for VIX, EPU, and SPX returns — Big features land where they should: COVID 2020, Fed cycle 2022, elections 2024
-   tariff shock spring 2025.
-2. **Rolling 1Y annualized SPX return**
-3. **Scatter: SPX returns vs VIX diff** — to test contemporaneous correlation.
-4. **Scatter: SPX returns vs EPU diff** — same test for EPU.
-5. **Scatter: |SPX returns| vs EPU diff** — to test whether EPU predicts
-   *magnitude* of moves, even if not direction.
+```bash
+# Fetch ~20k closed markets from Gamma → data/all_resolved_markets.parquet
+python market_collector.py --keywords fomc,powell,fed --refresh-cache
 
-## Findings
+# Look up conditionId for a slug
+python lookup_market.py will-fed-cut-interest-rates-3-times-by-dec-meeting
+```
 
-### 1. VIX is essentially mechanical with SPX
-Strong negative correlation (~-0.8) between VIX changes and SPX returns. Tight
-diagonal cloud on the scatter
+### 2. Trades
 
-### 2. EPU has near-zero predictive power over SPX returns
-Correlation between EPU diffs and SPX returns is roughly -0.10 — a barely-
-visible downward tilt on the scatter, mostly a blob. With ~190 monthly
-observations, this is borderline noise. **News-based aggregate economic policy
-uncertainty does not meaningfully predict broad market direction at monthly
-frequency.**
+```bash
+python trade_puller.py <condition_id>
+python view_trades.py
+```
 
-### 3. EPU doesn't clearly predict return magnitude either
-Tested EPU diff vs |SPX return| (the "does uncertainty predict bigger moves?"
-hypothesis). Slope is slightly positive but the cloud is huge and the
-confidence band crosses zero. Effect, if it exists, is small.
+### 3. Funding (per-wallet USDC on Polygon)
 
-## Stack
+```bash
+python funding_puller.py
+python funding_puller.py --only-wallet 0x... --force
+```
 
-Python, pandas, fredapi, yfinance, matplotlib, seaborn.
+### 4. Features
+
+```bash
+python build_wallet_features.py --force
+python build_features.py --force
+```
+
+## Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `market_collector.py` | Gamma `/markets` → parquet + keyword filter |
+| `lookup_market.py` | Slug → `conditionId` from parquet |
+| `trade_puller.py` | Data API fills → `data/trades.db` |
+| `funding_puller.py` | Etherscan USDC transfers → same DB |
+| `build_wallet_features.py` | One row per wallet |
+| `build_features.py` | One row per trade (ex-ante + post) |
+| `view_trades.py` | Preview trades table |
+| `polymarket_history.py` | CLOB price history (optional) |
+
+## Data layout
+
+```
+data/
+  all_resolved_markets.parquet   # market metadata cache
+  trades.db                      # trades, funding_events, wallet_features, features
+```
+
+Large/generated files are gitignored; rebuild locally with the scripts above.
+
+## API keys
+
+- **Gamma / Data API** — no key required
+- **Etherscan V2** (Polygon) — `ETHERSCAN_API_KEY` in `.env` for `funding_puller.py`
