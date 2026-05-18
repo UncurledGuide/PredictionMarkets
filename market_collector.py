@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sqlite3
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -22,6 +23,21 @@ import requests
 
 GAMMA_MARKETS_URL = "https://gamma-api.polymarket.com/markets"
 DEFAULT_CACHE = Path("data/all_resolved_markets.parquet")
+DEFAULT_DB = Path("data/trades.db")
+
+MARKETS_SCHEMA = """
+DROP TABLE IF EXISTS markets;
+
+CREATE TABLE markets (
+    condition_id        TEXT PRIMARY KEY,
+    market_slug         TEXT,
+    question            TEXT,
+    resolution_outcome  TEXT,
+    volume_usd          REAL,
+    end_date            TEXT,
+    category            TEXT
+);
+"""
 
 
 def safe_float(x) -> float:
@@ -158,6 +174,67 @@ def fetch_markets_to_cache(
     return markets
 
 
+def _format_end_date(value) -> str | None:
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    if isinstance(value, datetime):
+        return value.isoformat()
+    return str(value)
+
+
+def write_markets_to_db(result: pd.DataFrame, db_path: str | Path) -> int:
+    """Persist matched markets into data/trades.db for downstream labelers."""
+    db_file = Path(db_path)
+    db_file.parent.mkdir(parents=True, exist_ok=True)
+
+    conn = sqlite3.connect(db_file)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.executescript(MARKETS_SCHEMA)
+
+    if result.empty:
+        conn.commit()
+        conn.close()
+        print(f"\nWrote 0 markets to {db_file}")
+        return 0
+
+    rows = []
+    for _, row in result.iterrows():
+        outcome = row.get("resolution_outcome")
+        if outcome is not None and not (isinstance(outcome, float) and pd.isna(outcome)):
+            outcome = str(outcome).upper()
+            if outcome not in ("YES", "NO"):
+                outcome = None
+        else:
+            outcome = None
+
+        rows.append({
+            "condition_id": row.get("condition_id"),
+            "market_slug": row.get("market_slug"),
+            "question": row.get("question"),
+            "resolution_outcome": outcome,
+            "volume_usd": safe_float(row.get("volume_usd")),
+            "end_date": _format_end_date(row.get("end_date")),
+            "category": row.get("category") if row.get("category") else None,
+        })
+
+    conn.executemany(
+        """
+        INSERT OR REPLACE INTO markets
+            (condition_id, market_slug, question, resolution_outcome,
+             volume_usd, end_date, category)
+        VALUES
+            (:condition_id, :market_slug, :question, :resolution_outcome,
+             :volume_usd, :end_date, :category)
+        """,
+        rows,
+    )
+    conn.commit()
+    n = conn.execute("SELECT COUNT(*) FROM markets").fetchone()[0]
+    conn.close()
+    print(f"\nWrote {n} markets to {db_file}")
+    return n
+
+
 def collect_resolved_market_slugs(
     keywords: list[str],
     min_volume_usd: float = 100_000,
@@ -166,6 +243,7 @@ def collect_resolved_market_slugs(
     require_binary: bool = True,
     cache_path: str | Path = DEFAULT_CACHE,
     refresh_cache: bool = False,
+    db_path: str | Path = DEFAULT_DB,
 ) -> pd.DataFrame:
     cache_file = Path(cache_path)
     markets = fetch_markets_to_cache(
@@ -309,6 +387,7 @@ def collect_resolved_market_slugs(
     if result.empty:
         print("\nWarning: zero markets matched. Try broadening keywords or filters.")
 
+    write_markets_to_db(result, db_path)
     return result
 
 
@@ -324,6 +403,7 @@ def main() -> int:
     parser.add_argument("--min-date", default="2023-01-01")
     parser.add_argument("--max-date", default=None)
     parser.add_argument("--no-binary", action="store_true", help="Don't require binary outcomes")
+    parser.add_argument("--db", default=str(DEFAULT_DB), help="SQLite DB for markets table")
     parser.add_argument("-o", "--output", help="Optional CSV output for matched markets")
     args = parser.parse_args()
 
@@ -336,6 +416,7 @@ def main() -> int:
         require_binary=not args.no_binary,
         cache_path=args.cache,
         refresh_cache=args.refresh_cache,
+        db_path=args.db,
     )
 
     if args.output:

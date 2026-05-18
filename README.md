@@ -37,12 +37,15 @@ python funding_puller.py
 python funding_puller.py --only-wallet 0x... --force
 ```
 
-### 4. Features
+### 4. Features + labels
 
 ```bash
 python build_wallet_features.py --force
 python build_features.py --force
+python build_trade_labels.py --force
 ```
+
+Train on: `features JOIN trade_labels ON tx_hash`
 
 ## Scripts
 
@@ -54,6 +57,7 @@ python build_features.py --force
 | `funding_puller.py` | Etherscan USDC transfers → same DB |
 | `build_wallet_features.py` | One row per wallet |
 | `build_features.py` | One row per trade (ex-ante + post) |
+| `build_trade_labels.py` | FIFO PnL labels (y) per trade |
 | `view_trades.py` | Preview trades table |
 | `polymarket_history.py` | CLOB price history (optional) |
 
