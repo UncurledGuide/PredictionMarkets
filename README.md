@@ -25,10 +25,26 @@ python lookup_market.py will-fed-cut-interest-rates-3-times-by-dec-meeting
 
 ### 2. Trades
 
+**REST (capped ~3,500 recent fills per market):**
+
 ```bash
 python trade_puller.py <condition_id>
 python view_trades.py
 ```
+
+**Subgraph (full on-chain history — recommended):**
+
+```bash
+python subgraph_trade_puller.py <condition_id>
+python subgraph_trade_puller.py --check-alive
+python subgraph_trade_puller.py --verify-only <condition_id>
+
+# After market_collector.py populated `markets` / parquet:
+python subgraph_trade_puller.py --all-markets
+```
+
+Pilot market: `0x260fd9d6b10746909a26c2af7a68b409f757c95a07dc57ddd480774a36c8399b`
+(Fed 3 cuts 2024). Verified: ~41k fills, 2024-03-21 → 2024-12-18, 20/20 REST overlap.
 
 ### 3. Funding (per-wallet USDC on Polygon)
 
@@ -53,7 +69,8 @@ Train on: `features JOIN trade_labels ON tx_hash`
 |--------|---------|
 | `market_collector.py` | Gamma `/markets` → parquet + keyword filter |
 | `lookup_market.py` | Slug → `conditionId` from parquet |
-| `trade_puller.py` | Data API fills → `data/trades.db` |
+| `trade_puller.py` | Data API fills → `data/trades.db` (recent only) |
+| `subgraph_trade_puller.py` | Goldsky orderbook subgraph → `data/trades.db` (full history) |
 | `funding_puller.py` | Etherscan USDC transfers → same DB |
 | `build_wallet_features.py` | One row per wallet |
 | `build_features.py` | One row per trade (ex-ante + post) |
