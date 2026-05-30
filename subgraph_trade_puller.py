@@ -348,14 +348,25 @@ def pull_market(
         conn.close()
 
 
-def load_condition_ids_from_db(db_path: Path) -> list[str]:
+def load_condition_ids_from_db(db_path: Path, resume: bool = False) -> list[str]:
     if not db_path.exists():
         return []
     conn = sqlite3.connect(db_path)
     try:
-        rows = conn.execute(
-            "SELECT condition_id FROM markets ORDER BY volume_usd DESC"
-        ).fetchall()
+        if resume:
+            rows = conn.execute(
+                """
+                SELECT condition_id FROM markets
+                WHERE condition_id NOT IN (
+                    SELECT condition_id FROM pull_runs WHERE status = 'success'
+                )
+                ORDER BY volume_usd DESC
+                """
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT condition_id FROM markets ORDER BY volume_usd DESC"
+            ).fetchall()
         return [r[0] for r in rows if r[0]]
     except sqlite3.OperationalError:
         return []
@@ -455,6 +466,11 @@ def main() -> int:
     parser.add_argument("--check-alive", action="store_true")
     parser.add_argument("--verify-only", action="store_true")
     parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Skip markets that already have a successful pull_run entry (use with --all-markets)",
+    )
+    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
@@ -480,14 +496,15 @@ def main() -> int:
         return 0
 
     if args.all_markets:
-        condition_ids = load_condition_ids_from_db(db_path)
+        condition_ids = load_condition_ids_from_db(db_path, resume=args.resume)
         if not condition_ids:
             condition_ids = load_condition_ids_from_parquet(Path(args.parquet))
         if not condition_ids:
             raise SystemExit(
                 "No markets found. Run market_collector.py first, or pass a condition_id."
             )
-        logger.info("Pulling %d markets from markets table / parquet", len(condition_ids))
+        label = "remaining" if args.resume else "total"
+        logger.info("Pulling %d %s markets", len(condition_ids), label)
     elif args.condition_id:
         condition_ids = [args.condition_id]
     else:
@@ -500,9 +517,18 @@ def main() -> int:
         meta["hasIndexingErrors"],
     )
 
+    failed: list[str] = []
     for i, cid in enumerate(condition_ids, 1):
         logger.info("[%d/%d] %s", i, len(condition_ids), cid)
-        pull_market(cid, db_path, args.endpoint, args.sleep)
+        try:
+            pull_market(cid, db_path, args.endpoint, args.sleep)
+        except Exception as err:
+            logger.warning("skipping %s after error: %s", cid, err)
+            failed.append(cid)
+            time.sleep(2)
+
+    if failed:
+        logger.warning("%d/%d markets failed: %s", len(failed), len(condition_ids), failed)
 
     if len(condition_ids) == 1:
         print_stats(db_path, condition_ids[0])

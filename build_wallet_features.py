@@ -81,6 +81,7 @@ def build(db_path: Path, force: bool) -> None:
 
     conn = sqlite3.connect(db_path)
     conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=60000")  # wait up to 60s for write lock
 
     existing = {r[0] for r in conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table'"

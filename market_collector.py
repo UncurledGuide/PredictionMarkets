@@ -102,7 +102,7 @@ def fetch_markets_to_cache(
     *,
     refresh: bool,
     min_volume_usd: float,
-    page_limit: int = 500,
+    page_limit: int = 100,
     hard_cap: int = 20_000,
 ) -> list[dict]:
     cache_path.parent.mkdir(parents=True, exist_ok=True)

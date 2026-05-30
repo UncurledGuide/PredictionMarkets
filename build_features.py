@@ -126,6 +126,7 @@ def build(db_path: Path, force: bool) -> None:
 
     conn = sqlite3.connect(db_path)
     conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=60000")
     conn.row_factory = sqlite3.Row
 
     existing = {r[0] for r in conn.execute(

@@ -1,0 +1,26 @@
+2026-05-29 23:35:29,300 INFO trade_labels: loaded 7804690 trades
+2026-05-30 00:38:36,669 INFO trade_labels: done
+
+=== trade_labels summary ===
+  thresholds:  pnl >= $100  AND  notional >= $500
+  total trades labeled:         7804690
+  label=1 (informed):           364142  (4.7%)
+  label=0 (not):                7440548  (95.3%)
+  distinct wallets:             379044
+  distinct informed wallets:    1219
+  trades w/ unmatched-sell flag:7779885
+
+  per-(wallet,market) PnL distribution:
+    min=-757,269  p25=0  p50=0  p75=0  p95=0  max=3,257,273
+
+  top 10 (wallet,market) by PnL:
+    0xac44cb78be97...  pnl=$   3,257,273  notional=$   5,431,012  label=1
+    0xee0d153c17fe...  pnl=$      96,585  notional=$     159,815  label=1
+    0xc311bbe0d557...  pnl=$      84,415  notional=$     478,404  label=1
+    0x37d10ffb6199...  pnl=$      73,895  notional=$      41,844  label=1
+    0xe8dd7741ccb1...  pnl=$      58,091  notional=$      66,112  label=1
+    0xe90bec87d9ef...  pnl=$      40,942  notional=$      79,285  label=1
+    0x45f2736ab887...  pnl=$      37,306  notional=$      36,152  label=1
+    0xead152b855ef...  pnl=$      34,071  notional=$      57,726  label=1
+    0x5da48936d61e...  pnl=$      30,600  notional=$      60,000  label=1
+    0x551e72eda42a...  pnl=$      28,778  notional=$     173,497  label=1

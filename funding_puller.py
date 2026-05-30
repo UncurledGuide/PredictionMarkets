@@ -132,11 +132,32 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     return conn
 
 
-def get_distinct_wallets(conn: sqlite3.Connection) -> list[str]:
-    """Read all unique proxy_wallet addresses from the trades table."""
-    cur = conn.execute(
-        "SELECT DISTINCT proxy_wallet FROM trades ORDER BY proxy_wallet"
-    )
+def get_distinct_wallets(
+    conn: sqlite3.Connection,
+    min_markets: int = 1,
+    min_notional: float = 0.0,
+) -> list[str]:
+    """Read unique proxy_wallet addresses from trades, with optional filters.
+
+    min_markets   — only include wallets trading this many distinct markets
+    min_notional  — only count trades above this notional size toward min_markets
+    """
+    if min_markets > 1 or min_notional > 0:
+        cur = conn.execute(
+            """
+            SELECT proxy_wallet
+            FROM trades
+            WHERE notional_usdc >= ?
+            GROUP BY proxy_wallet
+            HAVING COUNT(DISTINCT condition_id) >= ?
+            ORDER BY proxy_wallet
+            """,
+            (min_notional, min_markets),
+        )
+    else:
+        cur = conn.execute(
+            "SELECT DISTINCT proxy_wallet FROM trades ORDER BY proxy_wallet"
+        )
     return [row[0] for row in cur.fetchall()]
 
 
@@ -358,11 +379,16 @@ def run(
     api_key: str,
     sleep_seconds: float,
     only_wallet: str | None = None,
+    min_markets: int = 1,
+    min_notional: float = 0.0,
     force: bool = False,
 ) -> None:
     conn = init_db(db_path)
 
-    wallets = [only_wallet.lower()] if only_wallet else get_distinct_wallets(conn)
+    wallets = (
+        [only_wallet.lower()] if only_wallet
+        else get_distinct_wallets(conn, min_markets=min_markets, min_notional=min_notional)
+    )
     completed = set() if force else get_completed_pulls(conn)
     total_pairs = len(wallets) * len(USDC_CONTRACTS)
     pairs_to_pull = sum(
@@ -423,6 +449,10 @@ def main() -> int:
                         help="Seconds between API requests (default 0.25 = 4 req/s).")
     parser.add_argument("--only-wallet", default=None,
                         help="Only pull this one wallet (useful for debugging).")
+    parser.add_argument("--min-markets", type=int, default=1,
+                        help="Only pull wallets trading at least this many distinct markets.")
+    parser.add_argument("--min-notional", type=float, default=0.0,
+                        help="Only count trades above this notional size toward --min-markets.")
     parser.add_argument("--force", action="store_true",
                         help="Re-pull all wallets even if marked completed.")
     parser.add_argument("--log-level", default="INFO",
@@ -444,6 +474,8 @@ def main() -> int:
         api_key=api_key,
         sleep_seconds=args.sleep,
         only_wallet=args.only_wallet,
+        min_markets=args.min_markets,
+        min_notional=args.min_notional,
         force=args.force,
     )
     return 0
