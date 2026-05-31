@@ -1,109 +1,109 @@
 {
-  "informed_wallets": 104,
-  "informed_trades": 10459,
-  "uninformed_trades": 172358,
-  "informed_mean_edge_cents": -51.6087,
-  "uninformed_mean_edge_cents": -53.0349,
-  "edge_difference_cents": 1.4262,
-  "welch_t": 2.429,
-  "welch_p": 0.01514,
-  "informed_vs_zero_t": -90.064,
+  "informed_wallets": 40,
+  "informed_trades": 2443,
+  "uninformed_trades": 180374,
+  "informed_mean_edge_cents": -46.8776,
+  "uninformed_mean_edge_cents": -53.0356,
+  "edge_difference_cents": 6.158,
+  "welch_t": 4.7692,
+  "welch_p": 2e-06,
+  "informed_vs_zero_t": -36.4786,
   "informed_vs_zero_p": 0.0,
   "top_clusters": [
     {
-      "cluster": "will-israel-win-eurovision",
-      "n_trades": 7,
-      "mean_edge_cents": 96.0,
-      "pct_correct": 100.0
-    },
-    {
-      "cluster": "will-volodymyr-zelenskyy-be-the-first-leader-out-in",
-      "n_trades": 19,
-      "mean_edge_cents": 78.8,
-      "pct_correct": 89.5
-    },
-    {
-      "cluster": "will-trump-and-zelenskyy-shake-hands-for-between-4-and-6-seconds",
-      "n_trades": 9,
-      "mean_edge_cents": 77.03,
-      "pct_correct": 88.9
-    },
-    {
-      "cluster": "will-vladimir-putin-be-the-first-leader-out-in",
-      "n_trades": 15,
-      "mean_edge_cents": 59.96,
-      "pct_correct": 80.0
-    },
-    {
-      "cluster": "will-the-us-next-strike-iran-on-january-29-2026-et",
-      "n_trades": 5,
-      "mean_edge_cents": 58.9,
-      "pct_correct": 80.0
-    },
-    {
-      "cluster": "will-benjamin-netanyahu-be-the-first-leader-out-in",
-      "n_trades": 18,
-      "mean_edge_cents": 55.49,
-      "pct_correct": 77.8
-    },
-    {
       "cluster": "ucl-bvb1-ata1-2026-02-17-bvb1",
-      "n_trades": 8,
-      "mean_edge_cents": 49.0,
+      "n_trades": 7,
+      "mean_edge_cents": 49.57,
       "pct_correct": 100.0
     },
     {
-      "cluster": "military-action-against-iran-continues-through-april",
-      "n_trades": 9,
-      "mean_edge_cents": 32.94,
+      "cluster": "will-the-us-next-strike-iran-on-february-23-2026-et",
+      "n_trades": 8,
+      "mean_edge_cents": 49.08,
+      "pct_correct": 75.0
+    },
+    {
+      "cluster": "will-israel-invade-lebanon",
+      "n_trades": 21,
+      "mean_edge_cents": 32.69,
       "pct_correct": 66.7
     },
     {
-      "cluster": "will-israel-take-military-action-in-lebanon-on-march",
+      "cluster": "us-military-action-against-iran",
+      "n_trades": 8,
+      "mean_edge_cents": 27.74,
+      "pct_correct": 75.0
+    },
+    {
+      "cluster": "will-the-us-next-strike-iran-on-february-19-2026-et",
+      "n_trades": 8,
+      "mean_edge_cents": 23.91,
+      "pct_correct": 62.5
+    },
+    {
+      "cluster": "will-the-us-next-strike-iran-on-february-24-2026-et",
       "n_trades": 8,
       "mean_edge_cents": 23.62,
-      "pct_correct": 25.0
+      "pct_correct": 62.5
     },
     {
-      "cluster": "us-x-iran-nuclear-deal-in",
-      "n_trades": 9,
-      "mean_edge_cents": 20.89,
-      "pct_correct": 66.7
+      "cluster": "will-the-us-next-strike-iran-on-february-26-2026-et",
+      "n_trades": 8,
+      "mean_edge_cents": 23.44,
+      "pct_correct": 62.5
     },
     {
-      "cluster": "will-the-us-not-strike-iran",
-      "n_trades": 263,
-      "mean_edge_cents": 18.88,
-      "pct_correct": 52.9
-    },
-    {
-      "cluster": "china-wins-the-most-gold-medals-in-2024-paris-olympics",
-      "n_trades": 11,
-      "mean_edge_cents": 17.82,
-      "pct_correct": 63.6
-    },
-    {
-      "cluster": "israel-military-response-against-iran",
+      "cluster": "will-the-us-next-strike-iran-on-february-25-2026-et",
       "n_trades": 13,
-      "mean_edge_cents": 14.94,
-      "pct_correct": 53.8
+      "mean_edge_cents": 21.79,
+      "pct_correct": 61.5
+    },
+    {
+      "cluster": "will-another-country-strike-iran",
+      "n_trades": 16,
+      "mean_edge_cents": 21.36,
+      "pct_correct": 81.2
+    },
+    {
+      "cluster": "will-the-us-next-strike-iran-on-february-20-2026-et",
+      "n_trades": 5,
+      "mean_edge_cents": 19.26,
+      "pct_correct": 60.0
     },
     {
       "cluster": "will-ukraine-hold-kursk-through",
-      "n_trades": 51,
-      "mean_edge_cents": 12.95,
-      "pct_correct": 23.5
+      "n_trades": 37,
+      "mean_edge_cents": 18.69,
+      "pct_correct": 32.4
     },
     {
-      "cluster": "iran-strike-on-israel",
-      "n_trades": 29,
-      "mean_edge_cents": 10.73,
-      "pct_correct": 44.8
+      "cluster": "will-the-us-next-strike-iran-on-january-26-2026-et",
+      "n_trades": 12,
+      "mean_edge_cents": 16.57,
+      "pct_correct": 58.3
+    },
+    {
+      "cluster": "will-the-us-not-strike-iran",
+      "n_trades": 115,
+      "mean_edge_cents": 14.13,
+      "pct_correct": 53.0
+    },
+    {
+      "cluster": "will-trump-and-putin-not-meet",
+      "n_trades": 10,
+      "mean_edge_cents": 10.94,
+      "pct_correct": 40.0
+    },
+    {
+      "cluster": "will-the-us-next-strike-iran-on-february-22-2026-et",
+      "n_trades": 13,
+      "mean_edge_cents": 7.49,
+      "pct_correct": 53.8
     }
   ],
   "thresholds": {
-    "min_cluster_correct": 0.6,
-    "min_cluster_prior": 3,
+    "min_cluster_correct": 0.75,
+    "min_cluster_prior": 5,
     "min_pnl": 100.0,
     "min_notional_per_trade": 1000.0
   }

@@ -1,0 +1,83 @@
+2026-05-30 22:20:15,871 INFO analyze_predictive_power: Tables present: ['cross_market_features', 'features', 'funding_events', 'funding_pull_runs', 'markets', 'pull_runs', 'sqlite_sequence', 'trade_labels', 'trades', 'wallet_features']
+2026-05-30 22:20:15,873 INFO analyze_predictive_power: Loaded resolution outcomes for 574 markets
+2026-05-30 22:29:43,980 INFO analyze_predictive_power: Cross-market signal: 583 wallets meet cluster correct rate >= 0.75 (prior >= 5)
+2026-05-30 22:29:46,205 INFO analyze_predictive_power: FIFO PnL signal: 1219 wallets with label=1
+2026-05-30 22:29:46,205 INFO analyze_predictive_power: Intersection (both signals): 40 wallets
+2026-05-30 22:29:46,205 INFO analyze_predictive_power: Union (either signal): 1762 wallets
+2026-05-30 22:29:46,206 INFO analyze_predictive_power: Final informed cohort: 40 wallets
+2026-05-30 22:29:46,206 INFO analyze_predictive_power: Loading trades on resolved markets (notional >= $1000)...
+2026-05-30 22:30:45,327 INFO analyze_predictive_power: Loaded 240450 qualifying trades
+2026-05-30 22:35:06,031 INFO analyze_predictive_power: Informed trades: 2443  |  Uninformed trades: 180374
+
+======================================================================
+  PREDICTIVE POWER ANALYSIS — POLYMARKET GEOPOLITICS
+======================================================================
+
+  Informed cohort:             40 wallets
+  Informed trades:          2,443
+  Uninformed trades:      180,374
+
+  ── Directional Edge (cents per dollar risked) ──
+  Informed mean edge:      -46.88¢  (p25=-97.90¢  p50=-85.00¢  p75=-0.20¢)
+  Uninformed mean edge:    -53.04¢  (p25=-97.50¢  p50=-85.00¢  p75=-0.70¢)
+
+  Difference:               +6.16¢
+  Welch t-test:          t=+4.769  p=0.0000  ***
+
+  Informed vs zero:      t=-36.479  p=0.0000  ***
+
+  ── Top 15 Clusters by Informed Directional Edge ──
+  cluster                                   n_trades   mean_edge   pct_correct
+  ucl-bvb1-ata1-2026-02-17-bvb1                    7     +49.57¢        100.0%
+  will-the-us-next-strike-iran-on-february-23-2026-et         8     +49.08¢         75.0%
+  will-israel-invade-lebanon                      21     +32.69¢         66.7%
+  us-military-action-against-iran                  8     +27.74¢         75.0%
+  will-the-us-next-strike-iran-on-february-19-2026-et         8     +23.91¢         62.5%
+  will-the-us-next-strike-iran-on-february-24-2026-et         8     +23.62¢         62.5%
+  will-the-us-next-strike-iran-on-february-26-2026-et         8     +23.44¢         62.5%
+  will-the-us-next-strike-iran-on-february-25-2026-et        13     +21.79¢         61.5%
+  will-another-country-strike-iran                16     +21.36¢         81.2%
+  will-the-us-next-strike-iran-on-february-20-2026-et         5     +19.26¢         60.0%
+  will-ukraine-hold-kursk-through                 37     +18.69¢         32.4%
+  will-the-us-next-strike-iran-on-january-26-2026-et        12     +16.57¢         58.3%
+  will-the-us-not-strike-iran                    115     +14.13¢         53.0%
+  will-trump-and-putin-not-meet                   10     +10.94¢         40.0%
+  will-the-us-next-strike-iran-on-february-22-2026-et        13      +7.49¢         53.8%
+
+  ── Entry Price on Winning Trades (lower = better information) ──
+  Informed wins:    n=531  mean=46.4¢  p50=49.0¢
+  Uninformed wins:  n=25,462  mean=61.8¢  p50=67.6¢
+  Entry price gap:  +15.33¢  t=-9.935  p=0.0000
+
+  ── Top 20 Informed Wallets by Mean Edge ──
+  wallet                n_trades   mean_edge   pct_correct
+  0x7cde9cc2fc1ff955...         3     +37.04¢        100.0%
+  0x92a6294cd55b9c6c...        81      -2.88¢         19.8%
+  0x477f156a229f1a17...        43      -8.72¢         39.5%
+  0xdd08917881cbda78...        22     -13.46¢         36.4%
+  0xf9fe29004c5a905c...        10     -19.86¢         40.0%
+  0x45b39e1f71e47fd4...         7     -25.36¢         71.4%
+  0x5da48936d61eb18d...        47     -26.55¢         51.1%
+  0x329529e574926056...         8     -26.83¢         62.5%
+  0x4e25605fd905e997...        73     -30.75¢         37.0%
+  0x43372356634781ee...        31     -31.07¢         19.4%
+  0x43440ab002eaac9f...        34     -32.89¢         26.5%
+  0x5cd5c8d7a17c78d7...       127     -35.88¢         22.8%
+  0xdbade4c82fb72780...        80     -38.09¢         40.0%
+  0xa9964972ac7fefa7...        23     -39.34¢         30.4%
+  0x35877d5656cb71b0...         7     -39.77¢          0.0%
+  0x8f69269039b9a401...       292     -42.11¢         26.4%
+  0xd48a81db62f742c4...        44     -43.84¢         27.3%
+  0x8a480b60cb78213f...        65     -47.82¢         29.2%
+  0x12d6cccfc7470a3f...       665     -48.32¢         20.3%
+  0x448861155279dbf8...       184     -48.82¢         25.5%
+
+  ── Trade Timing vs. Resolution (days before resolution) ──
+  (Negative = before resolution, Positive = after)
+  Informed:    p10=1.0d  p50=10.5d  p90=67.5d  mean=23.3d
+  Uninformed:  p10=1.4d  p50=12.1d  p90=48.7d  mean=22.1d
+  Informed trade earlier?  t=+1.412  p=0.1578 (ns)
+
+  Summary saved to: results/predictive_power_summary.json
+======================================================================
+
